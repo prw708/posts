@@ -1,0 +1,24 @@
+extends ../../views/base.pug
+
+block append scripts
+  if cookieOptOut.acceptAnalytics
+    script(
+      id="recaptchaAPI"
+      type="text/javascript"
+      src=`https://www.google.com/recaptcha/api.js?render=${recaptchaSiteKey}`
+    )
+
+block content
+  div(class="position-relative container-fluid px-0")
+    header(class="row p-4 g-0")
+      h1(class="display-3") Posts
+
+  div(class="row g-0")
+    noscript JavaScript must be enabled to view this content.
+    div(
+      id="root" 
+      data-username=loggedInAs
+      data-recaptchaSiteKey=recaptchaSiteKey
+    )
+
+  script(src="/projects/posts/static/js/main.622718cc.js")
