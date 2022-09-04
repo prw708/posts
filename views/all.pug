@@ -15,6 +15,9 @@ block content
 
   div(class="row g-0")
     noscript JavaScript must be enabled to view this content.
+    if !cookieOptOut.acceptAnalytics
+      div(class="analyticsCookieNotice")
+        p(class="alert alert-danger px-4 mb-0") Cookie settings must be set to accept analytics cookies to load all elements.
     div(
       id="root" 
       data-username=loggedInAs
