@@ -6,9 +6,7 @@ const utils = require('../../scripts/utilities');
 const winston = require('../../scripts/log');
 const rateLimiter = require('../../scripts/rateLimiter');
 
-const mongoose = require('mongoose');
-const accountModels = require('../../account/models.js');
-const postModels = require('../models.js');
+const web = require('../../dbWeb.js');
 
 const BASEPATH = '/projects/posts';
 
@@ -19,7 +17,7 @@ exports.home_get = function(req, res, next) {
 };
 
 exports.users_get = function(req, res, next) {
-  accountModels.user.find({})
+  web.user.find({})
     .exec()
     .then(function(users) {
       if (!users) {
@@ -37,7 +35,7 @@ exports.users_get = function(req, res, next) {
 };
 
 exports.posts_get = function(req, res, next) {
-  postModels.post.find({})
+  web.post.find({})
     .sort({ date: 'desc' })
     .exec()
     .then(function(posts) {
@@ -69,7 +67,7 @@ exports.posts_paged_get = [
     if (errors.isEmpty()) {
       size = data.size;
     }
-    postModels.post.find({})
+    web.post.find({})
       .sort({ date: 'desc' })
       .limit(size)
       .exec()
@@ -108,7 +106,7 @@ exports.posts_user_paged_get = [
     let size = 5;
     if (errors.isEmpty()) {
       size = data.size;
-      postModels.post.find({ author: data.author })
+      web.post.find({ author: data.author })
         .sort({ date: 'desc' })
         .limit(size)
         .exec()
@@ -182,10 +180,10 @@ exports.posts_add_post = [
           }
         });
         let count;
-        postModels.post.countDocuments({ author: req.session.loggedInAs }).exec()
+        web.post.countDocuments({ author: req.session.loggedInAs }).exec()
         .then(function(postsCount) {
           count = postsCount;
-          return accountModels.userLevel.findOne({ user: req.session.loggedInAsId }).exec();
+          return web.userLevel.findOne({ user: req.session.loggedInAsId }).exec();
         })
         .then(function(userLevel) {
           if ((count + 1) > userLevel.maxPosts) {
@@ -195,7 +193,7 @@ exports.posts_add_post = [
           return userLevel.save();
         })
         .then(async function(userLevel) {
-          let newPost = new postModels.post({
+          let newPost = new web.post({
             id: uuidv4(),
             title: data.title,
             post: data.post,
@@ -287,7 +285,7 @@ exports.posts_update_post = [
             parsedJSON.score >= 0.7 && 
             parsedJSON.action === 'update' &&
             parsedJSON.hostname === req.hostname) {
-          return postModels.post.findOne({ id: data.id, author: req.session.loggedInAs }).exec();
+          return web.post.findOne({ id: data.id, author: req.session.loggedInAs }).exec();
         } else {
           return Promise.reject('Failed reCAPTCHA test.');
         }
@@ -361,7 +359,7 @@ exports.posts_delete_post = [
             parsedJSON.score >= 0.7 && 
             parsedJSON.action === 'delete' &&
             parsedJSON.hostname === req.hostname) {
-          return postModels.post.findOneAndDelete({ id: data.id, author: req.session.loggedInAs }).exec();
+          return web.post.findOneAndDelete({ id: data.id, author: req.session.loggedInAs }).exec();
         } else {
           return Promise.reject('Failed reCAPTCHA test.');
         }
@@ -442,7 +440,7 @@ exports.comments_add_post = [
             parsedJSON.score >= 0.7 && 
             parsedJSON.action === 'addComment' &&
             parsedJSON.hostname === req.hostname) {
-          return postModels.post.findOne({ id: data.id }).exec();
+          return web.post.findOne({ id: data.id }).exec();
         } else {
           return Promise.reject('Failed reCAPTCHA test.');
         }
@@ -468,7 +466,7 @@ exports.comments_add_post = [
       })
       .then(function(match) {
         comment.date = comment.date.toISOString();
-        return accountModels.userLevel.findOne({ user: req.session.loggedInAsId }).exec();
+        return web.userLevel.findOne({ user: req.session.loggedInAsId }).exec();
       })
       .then(function(userLevel) {
         userLevel.experience++;
@@ -545,7 +543,7 @@ exports.comments_delete_post = [
             parsedJSON.score >= 0.7 && 
             parsedJSON.action === 'deleteComment' &&
             parsedJSON.hostname === req.hostname) {
-          return postModels.post.findOne({ id: data.id }).exec();
+          return web.post.findOne({ id: data.id }).exec();
         } else {
           return Promise.reject('Failed reCAPTCHA test.');
         }
