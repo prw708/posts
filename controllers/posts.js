@@ -130,18 +130,16 @@ exports.posts_user_paged_get = [
 ];
 
 exports.posts_add_post = [
-  body('title', 'Must not be empty. Can contain A-Z, a-z, 0-9, spaces, and _.,?!-.')
+  body('title', 'Must not be empty. Can contain A-Z, a-z, 0-9, spaces, and _.,?!"\'-.')
     .trim()
     .isLength({ min: 1, max: 100 })
-    .matches(/^[A-Za-z0-9 _,!.?-]{1,100}$/)
-    .whitelist('A-Za-z0-9 _,!.?\\-')
-    .escape(),
-  body('post', 'Must not be empty. Can contain A-Z, a-z, 0-9, spaces, and _.,?!-.')
+    .matches(/^[A-Za-z0-9 _.,?!"'-]{1,100}$/)
+    .whitelist('A-Za-z0-9 _.,?!"\'\\-'),
+  body('post', 'Must not be empty. Can contain A-Z, a-z, 0-9, spaces, and _.,?!"\'-.')
     .trim()
     .isLength({ min: 1, max: 200 })
-    .matches(/^[A-Za-z0-9 _,!.?-\s]{1,200}$/)
-    .whitelist('A-Za-z0-9 _,!.?\\-\\s')
-    .escape(),
+    .matches(/^[A-Za-z0-9 _.,?!"'\s-]{1,200}$/)
+    .whitelist('A-Za-z0-9 _.,?!"\'\\s\\-'),
   body('author', 'Must be between 1 to 50 characters. Can contain A-Z, a-z, 0-9, and -.')
     .trim()
     .isLength({ min: 1, max: 50 })
@@ -242,18 +240,16 @@ exports.posts_update_post = [
     .matches(/^[A-Fa-f0-9\-]{36}$/)
     .whitelist('A-Fa-f0-9\\-')
     .escape(),
-  body('title', 'Must not be empty. Can contain A-Z, a-z, 0-9, spaces, and _.,?!-.')
+  body('title', 'Must not be empty. Can contain A-Z, a-z, 0-9, spaces, and _.,?!"\'-.')
     .trim()
     .isLength({ min: 1, max: 100 })
-    .matches(/^[A-Za-z0-9 _,!.?-]{1,100}$/)
-    .whitelist('A-Za-z0-9 _,!.?\\-')
-    .escape(),
-  body('post', 'Must not be empty. Can contain A-Z, a-z, 0-9, spaces, and _.,?!-.')
+    .matches(/^[A-Za-z0-9 _.,?!"'-]{1,100}$/)
+    .whitelist('A-Za-z0-9 _.,?!"\'\\-'),
+  body('post', 'Must not be empty. Can contain A-Z, a-z, 0-9, spaces, and _.,?!"\'-.')
     .trim()
     .isLength({ min: 1, max: 200 })
-    .matches(/^[A-Za-z0-9 _,!.?-\s]{1,200}$/)
-    .whitelist('A-Za-z0-9 _,!.?\\-\\s')
-    .escape(),
+    .matches(/^[A-Za-z0-9 _.,?!"'\s-]{1,200}$/)
+    .whitelist('A-Za-z0-9 _.,?!"\'\\s\\-'),
   body('author', 'Must be between 1 to 50 characters. Can contain A-Z, a-z, 0-9, and -.')
     .trim()
     .isLength({ min: 1, max: 50 })
@@ -396,12 +392,11 @@ exports.comments_add_post = [
     .matches(/^[A-Fa-f0-9\-]{36}$/)
     .whitelist('A-Fa-f0-9\\-')
     .escape(),
-  body('comment', 'Must not be empty. Can contain A-Z, a-z, 0-9, spaces, and _.,?!-.')
+  body('comment', 'Must not be empty. Can contain A-Z, a-z, 0-9, spaces, and _.,?!"\'-.')
     .trim()
     .isLength({ min: 1, max: 200 })
-    .matches(/^[A-Za-z0-9 _,!.?-\s]{1,200}$/)
-    .whitelist('A-Za-z0-9 _,!.?\\-\\s')
-    .escape(),
+    .matches(/^[A-Za-z0-9 _.,?!"'\s-]{1,200}$/)
+    .whitelist('A-Za-z0-9 _.,?!"\'\\s\\-'),
   body('author', 'Must be between 1 to 50 characters. Can contain A-Z, a-z, 0-9, and -.')
     .trim()
     .isLength({ min: 1, max: 50 })

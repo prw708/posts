@@ -156,7 +156,7 @@ export default function Post(props) {
 
   const validate = () => {
     let commentValidity = false;
-    if (/^[A-Za-z0-9 !.,?\-\s]+$/.test(comment) && comment.length < 200) {
+    if (/^[A-Za-z0-9 !.,?"'\s\-]+$/.test(comment) && comment.length < 200) {
       setCommentValid(true);
       commentValidity = true;
     } else {
@@ -264,6 +264,8 @@ export default function Post(props) {
                 rows="3"
                 value={comment}
                 onChange={onCommentChanged}
+                maxLength="200"
+                autoComplete="off"
               ></textarea>
               { !commentValid && 
                 <div className="invalid-feedback">Comment can only contain valid characters and must be less than 200 characters.</div>

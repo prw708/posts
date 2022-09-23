@@ -42,14 +42,14 @@ export const EditPostForm = (props) => {
   const [invalidEditPostMessage, setInvalidEditPostMessage] = useState('');
   const validate = () => {
     let titleValidity = false, postValidity = false;
-    if (/^[A-Za-z0-9 _!.,?-]+$/.test(title) && title.length <= 100) {
+    if (/^[A-Za-z0-9 _!.,?"'-]+$/.test(title) && title.length <= 100) {
       setTitleValid(true);
       titleValidity = true;
     } else {
       setTitleValid(false);
       titleValidity = false;
     }
-    if (/^[A-Za-z0-9 _!.,?\s-]+$/.test(postContent) && postContent.length <= 200) {
+    if (/^[A-Za-z0-9 _!.,?"'\s-]+$/.test(postContent) && postContent.length <= 200) {
       setPostValid(true);
       postValidity = true;
     } else {
@@ -133,6 +133,8 @@ export const EditPostForm = (props) => {
               className={titleValid ? "form-control" : "form-control is-invalid"}
               value={title}
               onChange={onTitleChanged}
+              maxLength="100"
+              autoComplete="off"
             />
             { !titleValid && 
               <div className="invalid-feedback">Title can only contain valid characters and must be less than 100 characters.</div>
@@ -146,6 +148,8 @@ export const EditPostForm = (props) => {
               rows="3"
               value={postContent}
               onChange={onPostChanged}
+              maxLength="200"
+              autoComplete="off"
             ></textarea>
             { !postValid && 
               <div className="invalid-feedback">Post can only contain valid characters and must be less than 200 characters.</div>
