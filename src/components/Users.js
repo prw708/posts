@@ -6,7 +6,12 @@ import PostsByUser from './PostsByUser';
 import { getUsers } from '../features/usersSlice';
 import { getPosts } from '../features/postsSlice';
 
-export default function Users() {
+export default function Users(props) {
+  useEffect(() => {
+    props.setSuccessMessage('');
+    props.setErrorMessage('');
+  }, []);
+
   const dispatch = useDispatch();
   const status = useSelector((state) => state.users.status);
   const error = useSelector((state) => state.users.error);
@@ -71,11 +76,13 @@ export default function Users() {
         </table>
       </React.Fragment>
     );
-  } else if (status === 'error') {
+  } else if (status === 'failed') {
+    props.setSuccessMessage('');
+    props.setErrorMessage('An error occurred while getting the users.');
     return (
       <React.Fragment>
         <span className="fs-1">Users</span>
-        <div className="alert alert-danger px-4 mt-4">{ error }</div>
+        <p className="my-4">No users to show.</p>
       </React.Fragment>
     );
   }

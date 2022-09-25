@@ -5,7 +5,16 @@ import SearchBar from './SearchBar';
 import PostList from './PostList';
 import { getPagedPosts } from '../features/postsSlice';
 
-export default function Home() {
+export default function Home(props) {
+  useEffect(() => {
+    if (props.status !== 'success') {
+      props.setSuccessMessage('');
+      props.setErrorMessage('');
+    } else {
+      props.setErrorMessage('');
+    }
+  }, []);
+
   const dispatch = useDispatch();
   const posts = useSelector((state) => state.posts.posts);
 
@@ -68,7 +77,13 @@ export default function Home() {
     <React.Fragment>
       <span className="fs-1">All Posts</span>
       <SearchBar onSearchBarChange={onSearchBarChange}></SearchBar>
-      <PostList status={status} posts={filteredPosts} error={error}></PostList>
+      <PostList 
+        status={status} 
+        posts={filteredPosts} 
+        error={error}
+        setSuccessMessage={props.setSuccessMessage}
+        setErrorMessage={props.setErrorMessage}
+      ></PostList>
     </React.Fragment>
   );
 }

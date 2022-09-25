@@ -6,6 +6,15 @@ import { TimeAgo } from './TimeAgo';
 import { getPosts, addComment, deleteComment, deletePost } from '../features/postsSlice';
 
 export default function Post(props) {
+  useEffect(() => {
+    if (props.status !== 'success') {
+      props.setSuccessMessage('');
+      props.setErrorMessage('');
+    } else {
+      props.setErrorMessage('');
+    }
+  }, []);
+
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
@@ -73,12 +82,20 @@ export default function Post(props) {
           'g-recaptcha-response': recaptchaToken
         })).unwrap();
         setThreadId(-1);
+        props.setSuccessMessage('Comment deleted successfully!');
+        props.setErrorMessage('');
       })
       .catch(function(error) {
-        for (const e of error) {
-          if (e.param === 'deleteCommentMessage') {
-            setInvalidDeleteCommentMessage(e.msg);
+        props.setSuccessMessage('');
+        if (!error || error.length === 0) {
+          props.setErrorMessage('An error occurred while deleting the comment.');
+        } else {
+          for (const e of error) {
+            if (e.param === 'deleteCommentMessage') {
+              setInvalidDeleteCommentMessage(e.msg);
+            }
           }
+          props.setErrorMessage('An error occurred while deleting the comment.');
         }
       });
     });
@@ -104,13 +121,21 @@ export default function Post(props) {
           time: props.time,
           'g-recaptcha-response': recaptchaToken
         })).unwrap();
+        props.setSuccessMessage('Post deleted successfully!');
+        props.setErrorMessage('');
         navigate("/projects/posts");
       })
       .catch(function(error) {
-        for (const e of error) {
-          if (e.param === 'deletePostMessage') {
-            setInvalidDeletePostMessage(e.msg);
+        props.setSuccessMessage('');
+        if (!error || error.length === 0) {
+          props.setErrorMessage('An error occurred while deleting the post.');
+        } else {
+          for (const e of error) {
+            if (e.param === 'deletePostMessage') {
+              setInvalidDeletePostMessage(e.msg);
+            }
           }
+          props.setErrorMessage('An error occurred while deleting the post.');
         }
       });
     });
@@ -139,18 +164,29 @@ export default function Post(props) {
           })).unwrap();
           setComment('');
           setCommentStatus('idle');
+          props.setSuccessMessage('Comment posted successfully!');
+          props.setErrorMessage('');
         })
         .catch(function(error) {
-          for (const e of error) {
-            if (e.param === 'comment') {
-              setCommentValid(false);
-            } else if (e.param === 'addCommentMessage') {
-              setInvalidAddCommentMessage(e.msg);
+          props.setSuccessMessage('');
+          if (!error || error.length === 0) {
+            props.setErrorMessage('An error occurred while adding the comment.');
+          } else {
+            for (const e of error) {
+              if (e.param === 'comment') {
+                setCommentValid(false);
+              } else if (e.param === 'addCommentMessage') {
+                setInvalidAddCommentMessage(e.msg);
+              }
             }
+            props.setErrorMessage('An error occurred while adding the comment.');
           }
           setCommentStatus('idle');
         });
       });
+    } else {
+      props.setSuccessMessage('');
+      props.setErrorMessage('There are errors in the Comment form.');
     }
   };
 
@@ -213,9 +249,6 @@ export default function Post(props) {
   } else if (status === 'success' || status === 'failed') {
     return (
       <article key={ post.id }>
-        { status === 'failed' && invalidDeletePostMessage && 
-          <div className="alert alert-danger px-4 mb-4">{ invalidDeletePostMessage }</div>
-        }
         <span className="fs-1">{ post.title }</span>
         <h6 className="mt-1 mb-3">
           <Link to={"/projects/posts/users/" + post.author } className="link-dark text-decoration-none">{ post.author }</Link>
@@ -233,17 +266,11 @@ export default function Post(props) {
         <div className="mb-4">
           <span className="fs-4">Discussion ({ renderedComments.reduce((curr, row) => curr + row.length, 0) })</span>
         </div>
-        { status === 'failed' && invalidDeleteCommentMessage && 
-          <div className="alert alert-danger px-4 my-4">{ invalidDeleteCommentMessage }</div>
-        }
         { renderedComments }
         { !props.username && 
           <div className="alert alert-info px-4 mt-4">
             You must be <a href="/website/account/login" className="link-dark">logged in</a> to comment.
           </div>
-        }
-        { status === 'failed' && invalidAddCommentMessage && 
-          <div className="alert alert-danger px-4 my-4">{ invalidAddCommentMessage }</div>
         }
         { props.username && 
           <form>

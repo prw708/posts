@@ -1,15 +1,23 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 
 import { addNewPost } from '../features/postsSlice';
 
 export const AddPostForm = (props) => {
+  useEffect(() => {
+    props.setSuccessMessage('');
+    props.setErrorMessage('');
+  }, []);
+
   const [title, setTitle] = useState('');
   const [post, setPost] = useState('');
   const [addStatus, setAddStatus] = useState('idle');
 
-  const status = useSelector((state) => state.posts.status);
+  const status = useSelector((state) => {
+    props.setStatus(state.posts.status);
+    return state.posts.status;
+  });
   const error = useSelector((state) => state.posts.error);
 
   const onTitleChanged = (e) => setTitle(e.target.value);
@@ -60,26 +68,40 @@ export const AddPostForm = (props) => {
           })).unwrap();
           setTitle('');
           setPost('');
+          props.setSuccessMessage('Post added successfully!');
+          props.setErrorMessage('');
           setAddStatus('idle');
           navigate("/projects/posts/" + posted.id);
         })
         .catch(function(error) {
-          for (const e of error) {
-            if (e.param === 'title') {
-              setTitleValid(false);
-            } else if (e.param === 'post') {
-              setPostValid(false);
-            } else if (e.param === 'addPostMessage') {
-              setInvalidAddPostMessage(e.msg);
-            }
-          }
+          props.setSuccessMessage('');
           setAddStatus('idle');
+          if (!error || error.length === 0) {
+            props.setErrorMessage('An error occurred adding the post.');
+          } else {
+            for (const e of error) {
+              if (e.param === 'title') {
+                setTitleValid(false);
+              } else if (e.param === 'post') {
+                setPostValid(false);
+              } else if (e.param === 'addPostMessage') {
+                setInvalidAddPostMessage(e.msg);
+              }
+            }
+            props.setErrorMessage('There are errors in the Add Post form.');
+          }
         });
       });
+    } else {
+      props.setSuccessMessage('');
+      props.setErrorMessage('There are errors in the Add Post form.');
+      setAddStatus('idle');
     }
   };
 
   if (!props.username) {
+    props.setSuccessMessage('');
+    props.setErrorMessage('You must be logged in to add posts.');
     return (<React.Fragment>
       <span className="fs-1">Add Post</span>
       <div className="alert alert-info mt-4 px-4">You must be <a href="/website/account/login" className="link-dark">logged in</a> to add a post.</div>

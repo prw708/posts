@@ -29,17 +29,9 @@ export default function PostList(props) {
       </article>;
     });
   } else if (props.status === 'failed') {
-    if (props.error && Array.isArray(props.error)) {
-      renderedPosts = props.error.map((err, index) => {
-        if (err.msg) {
-          return <div key={index} className="alert alert-danger px-4 mt-4">{ err.msg }</div>;
-        } else {
-          return false;
-        }
-      });
-    } else {
-      renderedPosts = <div className="alert alert-danger px-4 mt-4">{ props.error }</div>;
-    }
+    props.setSuccessMessage('');
+    props.setErrorMessage('An error occurred while getting the posts.');
+    renderedPosts = null;
   }
 
   if (!renderedPosts || renderedPosts.length === 0) {

@@ -7,6 +7,12 @@ export default function Layout(props) {
   return (
     <React.Fragment>
       <div className="row g-0">
+        { props.successMessage &&
+          <div className="alert alert-success px-4 mb-0">{ props.successMessage }</div>
+        }
+        { props.errorMessage &&
+          <div className="alert alert-danger px-4 mb-0">{ props.errorMessage }</div>
+        }
         <nav className="d-flex flex-column flex-shrink-0 p-4 bg-light col-sm-5 col-md-4 col-lg-3">
           <Link to="/projects/posts" className="d-flex align-items-center mb-0 me-md-auto link-dark text-decoration-none">
             <span className="fs-4">Actions</span>

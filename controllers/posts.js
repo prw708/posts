@@ -374,7 +374,7 @@ exports.posts_delete_post = [
         errors = errors.array({ onlyFirstError: true });
         errors.push({
           param: 'deletePostMessage',
-          msg: 'Delete post failed.'
+          msg: 'An error occurred while deleting the post.'
         });
         res.status(400).json(errors);
       });
@@ -477,7 +477,7 @@ exports.comments_add_post = [
         errors = errors.array({ onlyFirstError: true });
         errors.push({
           param: 'addCommentMessage',
-          msg: 'Add comment failed.'
+          msg: 'An error occurred while adding the comment.'
         });
         res.status(400).json(errors);
       });
@@ -571,7 +571,7 @@ exports.comments_delete_post = [
         errors = errors.array({ onlyFirstError: true });
         errors.push({
           param: 'deleteCommentMessage',
-          msg: 'Delete comment failed.'
+          msg: 'An error occurred while deleting the comment.'
         });
         res.status(400).json(errors);
       });

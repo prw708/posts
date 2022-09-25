@@ -5,6 +5,11 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { getPosts, updatePost } from '../features/postsSlice';
 
 export const EditPostForm = (props) => {
+  useEffect(() => {
+    props.setSuccessMessage('');
+    props.setErrorMessage('');
+  }, []);
+
   const params = useParams();
   const postId = params.postId;
 
@@ -76,22 +81,37 @@ export const EditPostForm = (props) => {
             time: props.time,
             'g-recaptcha-response': recaptchaToken
           })).unwrap();
+          props.setSuccessMessage('Post edited successfully!');
+          props.setErrorMessage('');
+          props.setStatus('success');
           setEditStatus('idle');
           navigate("/projects/posts/" + post.id);
         })
         .catch(function(error) {
-          for (const e of error) {
-            if (e.param === 'title') {
-              setTitleValid(false);
-            } else if (e.param === 'post') {
-              setPostValid(false);
-            } else if (e.param === 'editPostMessage') {
-              setInvalidEditPostMessage(e.msg);
-            }
-          }
+          props.setSuccessMessage('');
+          props.setStatus('idle');
           setEditStatus('idle');
+          if (!error || error.length === 0) {
+            props.setErrorMessage('An error occurred editing the post.');
+          } else {
+            for (const e of error) {
+              if (e.param === 'title') {
+                setTitleValid(false);
+              } else if (e.param === 'post') {
+                setPostValid(false);
+              } else if (e.param === 'editPostMessage') {
+                setInvalidEditPostMessage(e.msg);
+              }
+            }
+            props.setErrorMessage('There are errors in the Edit Post form.');
+          }
         });
       });
+    } else {
+      props.setSuccessMessage('');
+      props.setErrorMessage('There are errors in the Edit Post form.');
+      props.setStatus('idle');
+      setEditStatus('idle');
     }
   };
 
@@ -103,19 +123,25 @@ export const EditPostForm = (props) => {
     );
   } else if (status === 'success' || status === 'failed') {
     if (!props.username) {
+      props.setSuccessMessage('');
+      props.setErrorMessage('You must be logged in to edit posts.');
       return (<React.Fragment>
         <span className="fs-1">Edit Post</span>
         <div className="alert alert-info mt-4 px-4">You must be <a href="/website/account/login" className="link-dark">logged in</a> to edit a post.</div>
       </React.Fragment>);
-    } else if (title === '' || postContent === '' || !post.author) {
+    } else if (!post || !post.title || !post.post || !post.author) {
+      props.setSuccessMessage('');
+      props.setErrorMessage('Post not found.');
       return (<React.Fragment>
         <span className="fs-1">Edit Post</span>
-        <div className="alert alert-danger mt-4 px-4">Post not found!</div>
+        <p className="mt-4">No post to edit.</p>
       </React.Fragment>);
     } else if (props.username !== post.author) {
+      props.setSuccessMessage('');
+      props.setErrorMessage('This post does not belong to you.');
       return (<React.Fragment>
         <span className="fs-1">Edit Post</span>
-        <div className="alert alert-danger mt-4 px-4">This is not your post!</div>
+        <p className="mt-4">No post to edit.</p>
       </React.Fragment>);
     }
     return (

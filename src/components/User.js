@@ -12,7 +12,12 @@ export const selectPostsByUser = createSelector(
   (posts, user) => posts.filter((p) => p.author === user)
 );
 
-export default function User() {
+export default function User(props) {
+  useEffect(() => {
+    props.setSuccessMessage('');
+    props.setErrorMessage('');
+  }, []);
+
   const dispatch = useDispatch();
   let params = useParams();
 
@@ -78,7 +83,13 @@ export default function User() {
     <React.Fragment>
       <span className="fs-1">{ params.user }</span>
       <SearchBar onSearchBarChange={onSearchBarChange}></SearchBar>
-      <PostList status={status} posts={filteredPostsByUser} error={error}></PostList>
+      <PostList 
+        status={status} 
+        posts={filteredPostsByUser} 
+        error={error}
+        setSuccessMessage={props.setSuccessMessage}
+        setErrorMessage={props.setErrorMessage}
+      ></PostList>
     </React.Fragment>
   );
 }
