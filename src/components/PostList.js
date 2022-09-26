@@ -6,13 +6,7 @@ import { parseISO, compareDesc } from 'date-fns';
 export default function PostList(props) {
   let renderedPosts;
 
-  if (props.status === 'loading') {
-    renderedPosts = (
-      <div className="d-flex justify-content-center my-4">
-        <div className="spinner-border" role="status"></div>
-      </div>
-    );
-  } else if (props.status === 'success') {
+  if (props.status === 'success' || props.status === 'loading') {
     let orderedPosts = props.posts.slice().sort((a, b) => {
       return compareDesc(parseISO(a.date), parseISO(b.date));
     });
@@ -41,6 +35,11 @@ export default function PostList(props) {
   return (
     <section className={ renderedPosts && renderedPosts.length > 0 ? "mt-4 border-top" : "" }>
       { renderedPosts }
+      { props.status === 'loading' && 
+        <div className="d-flex justify-content-center my-4">
+          <div className="spinner-border" role="status"></div>
+        </div>
+      }
     </section>
   );
 }

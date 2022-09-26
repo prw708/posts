@@ -26,7 +26,7 @@ export const getPagedPosts = createAsyncThunk(
   'posts/getPagedPosts',
   async (data, { rejectWithValue }) => {
     try {
-      let path = '/projects/posts/all/' + data.size;
+      let path = '/projects/posts/all/' + data.size + '/' + data.skip + '?searchText=' + data.searchText;
       const response = await getJSON(path, {
         'X-Requested-With': 'XMLHttpRequest',
         'Content-Type': 'application/json;charset=UTF-8'
@@ -42,7 +42,7 @@ export const getUserPagedPosts = createAsyncThunk(
   'posts/getUserPagedPosts',
   async (data, { rejectWithValue }) => {
     try {
-      let path = '/projects/posts/users/' + data.author + '/' + data.size;
+      let path = '/projects/posts/users/' + data.author + '/' + data.size + '/' + data.skip + '?searchText=' + data.searchText;
       const response = await getJSON(path, {
         'X-Requested-With': 'XMLHttpRequest',
         'Content-Type': 'application/json;charset=UTF-8'

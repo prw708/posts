@@ -23,23 +23,51 @@ export default function Home(props) {
 
   const POST_SCROLL_ADD = 5;
   const [size, setSize] = useState(POST_SCROLL_ADD);
+  const [skip, setSkip] = useState(0);
+  const [searchText, setSearchText] = useState('');
+  const [allPosts, setAllPosts] = useState([]);
+  const [limitReached, setLimitReached] = useState(false);
+  const [forceUpdate, setForceUpdate] = useState(false);
+  const [newValue, setNewValue] = useState(true);
 
   useEffect(() => {
+    if (limitReached) {
+      return;
+    }
     if (status === 'idle') {
-      dispatch(getPagedPosts({size}));
+      dispatch(getPagedPosts({
+        size: size,
+        skip: skip,
+        searchText: searchText
+      }));
+    }
+    if (status === 'loading') {
+      setNewValue(true);
     }
     if (status === 'success') {
-      setFilteredPosts(posts);
+      if (!posts || posts.length === 0) {
+        setLimitReached(true);
+      }
+      if (newValue) {
+        setAllPosts([...allPosts, ...posts]);
+      }
+      setNewValue(false);
     }
-  }, [status, dispatch, size, posts]);
+  }, [status, posts]);
 
   useEffect(() => {
-    dispatch(getPagedPosts({size}));
-  }, [dispatch, size]);
+    if (limitReached) {
+      return;
+    }
+    dispatch(getPagedPosts({
+      size: size,
+      skip: skip,
+      searchText: searchText
+    }));
+  }, [skip, forceUpdate]);
 
   useEffect(() => {
     let update = null;
-    let prevScroll = Math.ceil(window.scrollY);
 
     const debounceScroll = () => {
       return function() {
@@ -52,12 +80,12 @@ export default function Home(props) {
     };
 
     const handleScroll = () => {
+      if (status === 'loading') {
+        return false;
+      }
       if (Math.ceil(window.innerHeight) + Math.ceil(window.scrollY) >= Math.ceil(document.body.scrollHeight) || 
           Math.ceil(window.innerHeight) + Math.ceil(window.pageYOffset) >= Math.ceil(document.body.scrollHeight)) {
-        if (prevScroll !== Math.ceil(window.scrollY) || prevScroll !== Math.ceil(window.pageYOffset)) {
-          prevScroll = (window.scrollY) ? Math.ceil(window.scrollY) : Math.ceil(window.pageYOffset);
-          setSize(prev => prev + POST_SCROLL_ADD);
-        }
+        setSkip(prev => prev + POST_SCROLL_ADD);
       }
     };
 
@@ -67,19 +95,27 @@ export default function Home(props) {
     };
   }, []);
 
-  const [filteredPosts, setFilteredPosts] = useState(posts);
+  useEffect(() => {
+    setAllPosts([]);
+    setLimitReached(false);
+    setSkip(0);
+    setForceUpdate(!forceUpdate);
+  }, [searchText]);
 
   const onSearchBarChange = (text) => {
-    setFilteredPosts(posts.filter(p => p.title.toLowerCase().includes(text.toLowerCase())));
+    setSearchText(text);
   };
 
   return (
     <React.Fragment>
       <span className="fs-1">All Posts</span>
-      <SearchBar onSearchBarChange={onSearchBarChange}></SearchBar>
+      <SearchBar 
+        searchText={searchText}
+        onSearchBarChange={onSearchBarChange}
+      ></SearchBar>
       <PostList 
         status={status} 
-        posts={filteredPosts} 
+        posts={allPosts} 
         error={error}
         setSuccessMessage={props.setSuccessMessage}
         setErrorMessage={props.setErrorMessage}

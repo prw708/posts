@@ -27,23 +27,53 @@ export default function User(props) {
 
   const POST_SCROLL_ADD = 5;
   const [size, setSize] = useState(POST_SCROLL_ADD);
+  const [skip, setSkip] = useState(0);
+  const [searchText, setSearchText] = useState('');
+  const [allPosts, setAllPosts] = useState([]);
+  const [limitReached, setLimitReached] = useState(false);
+  const [forceUpdate, setForceUpdate] = useState(false);
+  const [newValue, setNewValue] = useState(true);
 
   useEffect(() => {
+    if (limitReached) {
+      return;
+    }
     if (status === 'idle') {
-      dispatch(getUserPagedPosts({author: params.user, size}));
+      dispatch(getUserPagedPosts({
+        author: params.user, 
+        size: size,
+        skip: skip,
+        searchText: searchText
+      }));
+    }
+    if (status === 'loading') {
+      setNewValue(true);
     }
     if (status === 'success') {
-      setFilteredPostsByUser(postsByUser);
+      if (!postsByUser || postsByUser.length === 0) {
+        setLimitReached(true);
+      }
+      if (newValue) {
+        setAllPosts([...allPosts, ...postsByUser]);
+      }
+      setNewValue(false);
     }
-  }, [status, dispatch, params.user, size, postsByUser]);
+  }, [status, postsByUser]);
 
   useEffect(() => {
-    dispatch(getUserPagedPosts({author: params.user, size}));
-  }, [dispatch, size, params.user]);
+    if (limitReached) {
+      return;
+    }
+    dispatch(getUserPagedPosts({
+      author: params.user, 
+      size: size,
+      skip: skip,
+      searchText: searchText
+    }));
+  }, [skip, forceUpdate]);
 
   useEffect(() => {
     let update = null;
-    let prevScroll = Math.ceil(window.scrollY);
 
     const debounceScroll = () => {
       return function() {
@@ -58,10 +88,7 @@ export default function User(props) {
     const handleScroll = () => {
       if (Math.ceil(window.innerHeight) + Math.ceil(window.scrollY) >= Math.ceil(document.body.scrollHeight) || 
           Math.ceil(window.innerHeight) + Math.ceil(window.pageYOffset) >= Math.ceil(document.body.scrollHeight)) {
-        if (prevScroll !== Math.ceil(window.scrollY) || prevScroll !== Math.ceil(window.pageYOffset)) {
-          prevScroll = (window.scrollY) ? Math.ceil(window.scrollY) : Math.ceil(window.pageYOffset);
-          setSize(prev => prev + POST_SCROLL_ADD);
-        }
+        setSkip(prev => prev + POST_SCROLL_ADD);
       }
     };
 
@@ -71,21 +98,27 @@ export default function User(props) {
     };
   }, []);
 
-  const [filteredPostsByUser, setFilteredPostsByUser] = useState(postsByUser);
+  useEffect(() => {
+    setAllPosts([]);
+    setLimitReached(false);
+    setSkip(0);
+    setForceUpdate(!forceUpdate);
+  }, [searchText]);
 
   const onSearchBarChange = (text) => {
-    setFilteredPostsByUser(
-      postsByUser.filter(p => p.title.toLowerCase().includes(text.toLowerCase()))
-    );
+    setSearchText(text);
   };
 
   return (
     <React.Fragment>
       <span className="fs-1">{ params.user }</span>
-      <SearchBar onSearchBarChange={onSearchBarChange}></SearchBar>
+      <SearchBar 
+        searchText={searchText}
+        onSearchBarChange={onSearchBarChange}
+      ></SearchBar>
       <PostList 
         status={status} 
-        posts={filteredPostsByUser} 
+        posts={allPosts} 
         error={error}
         setSuccessMessage={props.setSuccessMessage}
         setErrorMessage={props.setErrorMessage}

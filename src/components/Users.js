@@ -4,7 +4,6 @@ import { Link } from 'react-router-dom';
 import PostsByUser from './PostsByUser';
 
 import { getUsers } from '../features/usersSlice';
-import { getPosts } from '../features/postsSlice';
 
 export default function Users(props) {
   useEffect(() => {
@@ -20,7 +19,6 @@ export default function Users(props) {
   useEffect(() => {
     if (status === 'idle') {
       dispatch(getUsers());
-      dispatch(getPosts());
     }
   }, [status, dispatch]);
 

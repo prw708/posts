@@ -60,30 +60,49 @@ exports.posts_paged_get = [
     .isNumeric({ no_symbols: true })
     .isInt({ min: 1 })
     .toInt(10),
+  param('skip', 'Invalid value.')
+    .trim()
+    .escape()
+    .isNumeric({ no_symbols: true })
+    .isInt({ min: 0 })
+    .toInt(10),
+  query('searchText', 'Invalid search text.')
+    .trim()
+    .isLength({ min: 1, max: 100 })
+    .matches(/^[A-Za-z0-9 _.,?!"'-]{1,100}$/)
+    .whitelist('A-Za-z0-9 _.,?!"\'\\-')
+    .optional({ checkFalsy: true }),
   function(req, res, next) {
-    let data = matchedData(req, { includeOptionals: true, onlyValidData: true, locations: ['params'] });
+    let data = matchedData(req, { includeOptionals: true, onlyValidData: true, locations: ['params', 'query'] });
     let errors = validationResult(req);
     let size = 5;
+    let skip = 0;
     if (errors.isEmpty()) {
       size = data.size;
+      skip = data.skip;
+      let searchParameters = (data.searchText) ? { title: new RegExp(data.searchText, 'i') } : {};
+      web.post.find(searchParameters)
+        .collation({ locale: 'en' })
+        .sort({ date: 'desc' })
+        .skip(skip)
+        .limit(size)
+        .exec()
+        .then(function(posts) {
+          if (!posts) {
+            return Promise.reject(null);
+          } else {
+            res.status(200).json(posts);
+          }
+        })
+        .catch(function(err) {
+          if (err) {
+            winston.logger.error(err);
+          }
+          res.status(400).json('Get posts failed.');
+        });
+    } else {
+      res.status(400).json('Get posts failed.');
     }
-    web.post.find({})
-      .sort({ date: 'desc' })
-      .limit(size)
-      .exec()
-      .then(function(posts) {
-        if (!posts) {
-          return Promise.reject(null);
-        } else {
-          res.status(200).json(posts);
-        }
-      })
-      .catch(function(err) {
-        if (err) {
-          winston.logger.error(err);
-        }
-        res.status(400).json('Get posts failed.');
-      });
   }
 ];
 
@@ -100,14 +119,33 @@ exports.posts_user_paged_get = [
     .isNumeric({ no_symbols: true })
     .isInt({ min: 1 })
     .toInt(10),
+  param('skip', 'Invalid value.')
+    .trim()
+    .escape()
+    .isNumeric({ no_symbols: true })
+    .isInt({ min: 0 })
+    .toInt(10),
+  query('searchText', 'Invalid search text.')
+    .trim()
+    .isLength({ min: 1, max: 100 })
+    .matches(/^[A-Za-z0-9 _.,?!"'-]{1,100}$/)
+    .whitelist('A-Za-z0-9 _.,?!"\'\\-')
+    .optional({ checkFalsy: true }),
   function(req, res, next) {
-    let data = matchedData(req, { includeOptionals: true, onlyValidData: true, locations: ['params'] });
+    let data = matchedData(req, { includeOptionals: true, onlyValidData: true, locations: ['params', 'query'] });
     let errors = validationResult(req);
     let size = 5;
+    let skip = 0;
     if (errors.isEmpty()) {
       size = data.size;
-      web.post.find({ author: data.author })
+      skip = data.skip;
+      let searchParameters = (data.searchText) ? 
+        { title: new RegExp(data.searchText, 'i'), author: data.author } :
+        { author: data.author };
+      web.post.find(searchParameters)
+        .collation({ locale: 'en' })
         .sort({ date: 'desc' })
+        .skip(skip)
         .limit(size)
         .exec()
         .then(function(posts) {

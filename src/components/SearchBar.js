@@ -1,14 +1,28 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 export default function SearchBar(props) {
 
   const [text, setText] = useState('');
+  let update = null;
 
   const onSearchBarChange = (e) => {
-    e.preventDefault();
-    setText(e.target.value);
     props.onSearchBarChange(e.target.value);
   };
+
+  const debounceChange = (e) => {
+    setText(e.target.value);
+    return function() {
+      clearTimeout(update);
+      update = setTimeout(function() {
+        update = null;
+        onSearchBarChange(e);
+      }, 1000);
+    };
+  };
+
+  useEffect(() => {
+    setText(props.searchText);
+  }, [props.searchText]);
 
   return (
     <form className="mt-4">
@@ -20,7 +34,7 @@ export default function SearchBar(props) {
           autoComplete="off"
           maxLength="100"
           value={text}
-          onChange={onSearchBarChange}
+          onChange={(e) => debounceChange(e)()}
         />
       </div>
     </form>
