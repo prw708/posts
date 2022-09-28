@@ -23,12 +23,10 @@ export default function PostList(props) {
       </article>;
     });
   } else if (props.status === 'failed') {
-    props.setSuccessMessage('');
-    props.setErrorMessage('An error occurred while getting the posts.');
     renderedPosts = null;
   }
 
-  if (!renderedPosts || renderedPosts.length === 0) {
+  if ((!renderedPosts || renderedPosts.length === 0) && props.status !== 'loading' && props.status !== 'idle') {
     renderedPosts = <p className="my-4">No posts to show.</p>;
   }
 

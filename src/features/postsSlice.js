@@ -147,6 +147,7 @@ const postsSlice = createSlice({
       .addCase(getPosts.fulfilled, (state, action) => {
         state.status = 'success';
         state.posts = action.payload;
+        state.error = null;
       })
       .addCase(getPosts.rejected, (state, action) => {
         state.status = 'failed';
@@ -158,6 +159,7 @@ const postsSlice = createSlice({
       .addCase(getPagedPosts.fulfilled, (state, action) => {
         state.status = 'success';
         state.posts = action.payload;
+        state.error = null;
       })
       .addCase(getPagedPosts.rejected, (state, action) => {
         state.status = 'failed';
@@ -169,6 +171,7 @@ const postsSlice = createSlice({
       .addCase(getUserPagedPosts.fulfilled, (state, action) => {
         state.status = 'success';
         state.posts = action.payload;
+        state.error = null;
       })
       .addCase(getUserPagedPosts.rejected, (state, action) => {
         state.status = 'failed';

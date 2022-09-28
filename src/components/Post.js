@@ -7,13 +7,12 @@ import { getPosts, addComment, deleteComment, deletePost } from '../features/pos
 
 export default function Post(props) {
   useEffect(() => {
-    if (props.status !== 'success') {
+    clearTimeout(props.updateMessageTimeout);
+    props.setUpdateMessageTimeout(setTimeout(() => {
       props.setSuccessMessage('');
       props.setErrorMessage('');
-    } else {
-      props.setErrorMessage('');
-    }
-  }, []);
+    }, 3000));
+  }, [props.updateMessage]);
 
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -25,10 +24,9 @@ export default function Post(props) {
   const error = useSelector((state) => state.posts.error);
 
   useEffect(() => {
-    if (status === 'idle') {
-      dispatch(getPosts());
-    }
-  }, [status, dispatch]);
+    dispatch(getPosts());
+    window.scrollTo(0, 0);
+  }, []);
 
   const post = useSelector((state) => {
     return state.posts.posts.find((p) => p.id === postId);
@@ -84,6 +82,8 @@ export default function Post(props) {
         setThreadId(-1);
         props.setSuccessMessage('Comment deleted successfully!');
         props.setErrorMessage('');
+        props.setUpdateMessage(!props.updateMessage);
+        window.scrollTo(0, 0);
       })
       .catch(function(error) {
         props.setSuccessMessage('');
@@ -97,6 +97,7 @@ export default function Post(props) {
           }
           props.setErrorMessage('An error occurred while deleting the comment.');
         }
+        props.setUpdateMessage(!props.updateMessage);
       });
     });
   };
@@ -123,6 +124,7 @@ export default function Post(props) {
         })).unwrap();
         props.setSuccessMessage('Post deleted successfully!');
         props.setErrorMessage('');
+        props.setUpdateMessage(!props.updateMessage);
         navigate("/projects/posts");
       })
       .catch(function(error) {
@@ -137,6 +139,7 @@ export default function Post(props) {
           }
           props.setErrorMessage('An error occurred while deleting the post.');
         }
+        props.setUpdateMessage(!props.updateMessage);
       });
     });
   };
@@ -166,6 +169,8 @@ export default function Post(props) {
           setCommentStatus('idle');
           props.setSuccessMessage('Comment posted successfully!');
           props.setErrorMessage('');
+          props.setUpdateMessage(!props.updateMessage);
+          window.scrollTo(0, 0);
         })
         .catch(function(error) {
           props.setSuccessMessage('');
@@ -182,11 +187,13 @@ export default function Post(props) {
             props.setErrorMessage('An error occurred while adding the comment.');
           }
           setCommentStatus('idle');
+          props.setUpdateMessage(!props.updateMessage);
         });
       });
     } else {
       props.setSuccessMessage('');
       props.setErrorMessage('There are errors in the Comment form.');
+      props.setUpdateMessage(!props.updateMessage);
     }
   };
 

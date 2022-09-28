@@ -3,10 +3,22 @@ import React, { useState, useEffect } from 'react';
 export default function SearchBar(props) {
 
   const [text, setText] = useState('');
+  const [textValidity, setTextValidity] = useState(true);
   let update = null;
 
+  const validate = (val) => {
+    if (/^[A-Za-z0-9 _!.,?"'-]{0,100}$/.test(val)) {
+      setTextValidity(true);
+      return true;
+    } else {
+      setTextValidity(false);
+      return false;
+    }
+  };
+
   const onSearchBarChange = (e) => {
-    props.onSearchBarChange(e.target.value);
+    let valid = validate(e.target.value);
+    props.onSearchBarChange(e.target.value, valid);
   };
 
   const debounceChange = (e) => {
@@ -20,22 +32,21 @@ export default function SearchBar(props) {
     };
   };
 
-  useEffect(() => {
-    setText(props.searchText);
-  }, [props.searchText]);
-
   return (
-    <form className="mt-4">
+    <form className="mt-4" onSubmit={(e) => e.preventDefault()}>
       <div className="mb-4">
         <input 
           type="text"
           id="searchBar"
-          className="form-control"
+          className={textValidity ? "form-control" : "form-control is-invalid"}
           autoComplete="off"
           maxLength="100"
           value={text}
           onChange={(e) => debounceChange(e)()}
         />
+        { !textValidity &&
+          <div className="invalid-feedback">Text can only contain valid characters and must be less than 100 characters.</div>
+        }
       </div>
     </form>
   );

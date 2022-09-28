@@ -7,9 +7,12 @@ import { getUsers } from '../features/usersSlice';
 
 export default function Users(props) {
   useEffect(() => {
-    props.setSuccessMessage('');
-    props.setErrorMessage('');
-  }, []);
+    clearTimeout(props.updateMessageTimeout);
+    props.setUpdateMessageTimeout(setTimeout(() => {
+      props.setSuccessMessage('');
+      props.setErrorMessage('');
+    }, 3000));
+  }, [props.updateMessage]);
 
   const dispatch = useDispatch();
   const status = useSelector((state) => state.users.status);
@@ -17,10 +20,9 @@ export default function Users(props) {
   const users = useSelector((state) => state.users.users);
 
   useEffect(() => {
-    if (status === 'idle') {
-      dispatch(getUsers());
-    }
-  }, [status, dispatch]);
+    dispatch(getUsers());
+    window.scrollTo(0, 0);
+  }, []);
 
   let renderedUsers;
   if (status === 'loading') {
@@ -77,6 +79,7 @@ export default function Users(props) {
   } else if (status === 'failed') {
     props.setSuccessMessage('');
     props.setErrorMessage('An error occurred while getting the users.');
+    props.setUpdateMessage(!props.updateMessage);
     return (
       <React.Fragment>
         <span className="fs-1">Users</span>

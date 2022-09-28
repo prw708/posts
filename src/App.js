@@ -13,7 +13,8 @@ import NotFound from './components/NotFound';
 function App(props) {
   const [successMessage, setSuccessMessage] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
-  const [status, setStatus] = useState('idle');
+  const [updateMessage, setUpdateMessage] = useState(false);
+  const [updateMessageTimeout, setUpdateMessageTimeout] = useState(null);
 
   return (
     <React.Fragment>
@@ -21,55 +22,73 @@ function App(props) {
         <Routes>
           <Route path="/projects/posts/" element={<Layout 
             {...props} 
+            updateMessage={updateMessage}
+            setUpdateMessage={setUpdateMessage}
+            updateMessageTimeout={updateMessageTimeout}
+            setUpdateMessageTimeout={setUpdateMessageTimeout}
             successMessage={successMessage}
             errorMessage={errorMessage}
           />}>
             <Route index element={<Home 
               {...props} 
-              status={status}
-              setStatus={setStatus}
+              updateMessage={updateMessage}
+              setUpdateMessage={setUpdateMessage}
+              updateMessageTimeout={updateMessageTimeout}
+              setUpdateMessageTimeout={setUpdateMessageTimeout}
               setSuccessMessage={setSuccessMessage}
               setErrorMessage={setErrorMessage}
             />} />
             <Route path="add" element={<AddPostForm 
               {...props} 
-              status={status}
-              setStatus={setStatus}
+              updateMessage={updateMessage}
+              setUpdateMessage={setUpdateMessage}
+              updateMessageTimeout={updateMessageTimeout}
+              setUpdateMessageTimeout={setUpdateMessageTimeout}
               setSuccessMessage={setSuccessMessage}
               setErrorMessage={setErrorMessage}
             />} />
             <Route path=":postId" element={<Post 
               {...props} 
-              status={status}
-              setStatus={setStatus}
+              updateMessage={updateMessage}
+              setUpdateMessage={setUpdateMessage}
+              updateMessageTimeout={updateMessageTimeout}
+              setUpdateMessageTimeout={setUpdateMessageTimeout}
               setSuccessMessage={setSuccessMessage}
               setErrorMessage={setErrorMessage}
             />} />
             <Route path="edit/:postId" element={<EditPostForm 
               {...props} 
-              status={status}
-              setStatus={setStatus}
+              updateMessage={updateMessage}
+              setUpdateMessage={setUpdateMessage}
+              updateMessageTimeout={updateMessageTimeout}
+              setUpdateMessageTimeout={setUpdateMessageTimeout}
               setSuccessMessage={setSuccessMessage}
               setErrorMessage={setErrorMessage}
             />} />
             <Route path="users" element={<Users 
               {...props} 
-              status={status}
-              setStatus={setStatus}
+              updateMessage={updateMessage}
+              setUpdateMessage={setUpdateMessage}
+              updateMessageTimeout={updateMessageTimeout}
+              setUpdateMessageTimeout={setUpdateMessageTimeout}
               setSuccessMessage={setSuccessMessage}
               setErrorMessage={setErrorMessage}
             />} />
             <Route path="users/:user" element={<User 
               {...props} 
-              status={status}
-              setStatus={setStatus}
+              updateMessage={updateMessage}
+              setUpdateMessage={setUpdateMessage}
+              updateMessageTimeout={updateMessageTimeout}
+              setUpdateMessageTimeout={setUpdateMessageTimeout}
               setSuccessMessage={setSuccessMessage}
               setErrorMessage={setErrorMessage}
             />} />
             <Route path="*" element={<NotFound 
               {...props} 
-              status={status}
-              setStatus={setStatus}
+              updateMessage={updateMessage}
+              setUpdateMessage={setUpdateMessage}
+              updateMessageTimeout={updateMessageTimeout}
+              setUpdateMessageTimeout={setUpdateMessageTimeout}
               setSuccessMessage={setSuccessMessage}
               setErrorMessage={setErrorMessage}
             />} />

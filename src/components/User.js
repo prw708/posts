@@ -14,9 +14,12 @@ export const selectPostsByUser = createSelector(
 
 export default function User(props) {
   useEffect(() => {
-    props.setSuccessMessage('');
-    props.setErrorMessage('');
-  }, []);
+    clearTimeout(props.updateMessageTimeout);
+    props.setUpdateMessageTimeout(setTimeout(() => {
+      props.setSuccessMessage('');
+      props.setErrorMessage('');
+    }, 3000));
+  }, [props.updateMessage]);
 
   const dispatch = useDispatch();
   let params = useParams();
@@ -33,6 +36,7 @@ export default function User(props) {
   const [limitReached, setLimitReached] = useState(false);
   const [forceUpdate, setForceUpdate] = useState(false);
   const [newValue, setNewValue] = useState(true);
+  const [forceTextUpdate, setForceTextUpdate] = useState(false);
 
   useEffect(() => {
     if (limitReached) {
@@ -103,10 +107,20 @@ export default function User(props) {
     setLimitReached(false);
     setSkip(0);
     setForceUpdate(!forceUpdate);
-  }, [searchText]);
+  }, [forceTextUpdate]);
 
-  const onSearchBarChange = (text) => {
-    setSearchText(text);
+  const onSearchBarChange = (text, valid) => {
+    if (valid) {
+      setSearchText(text);
+      props.setUpdateMessage(!props.updateMessage);
+      setForceTextUpdate(!forceTextUpdate);
+    } else {
+      setAllPosts([]);
+      setLimitReached(false);
+      props.setSuccessMessage('');
+      props.setErrorMessage('There is an error in the Search Bar.');
+      props.setUpdateMessage(!props.updateMessage);
+    }
   };
 
   return (
@@ -119,9 +133,6 @@ export default function User(props) {
       <PostList 
         status={status} 
         posts={allPosts} 
-        error={error}
-        setSuccessMessage={props.setSuccessMessage}
-        setErrorMessage={props.setErrorMessage}
       ></PostList>
     </React.Fragment>
   );

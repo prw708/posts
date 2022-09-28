@@ -6,16 +6,18 @@ import { addNewPost } from '../features/postsSlice';
 
 export const AddPostForm = (props) => {
   useEffect(() => {
-    props.setSuccessMessage('');
-    props.setErrorMessage('');
-  }, []);
+    clearTimeout(props.updateMessageTimeout);
+    props.setUpdateMessageTimeout(setTimeout(() => {
+      props.setSuccessMessage('');
+      props.setErrorMessage('');
+    }, 3000));
+  }, [props.updateMessage]);
 
   const [title, setTitle] = useState('');
   const [post, setPost] = useState('');
   const [addStatus, setAddStatus] = useState('idle');
 
   const status = useSelector((state) => {
-    props.setStatus(state.posts.status);
     return state.posts.status;
   });
   const error = useSelector((state) => state.posts.error);
@@ -70,6 +72,7 @@ export const AddPostForm = (props) => {
           setPost('');
           props.setSuccessMessage('Post added successfully!');
           props.setErrorMessage('');
+          props.setUpdateMessage(!props.updateMessage);
           setAddStatus('idle');
           navigate("/projects/posts/" + posted.id);
         })
@@ -90,11 +93,13 @@ export const AddPostForm = (props) => {
             }
             props.setErrorMessage('There are errors in the Add Post form.');
           }
+          props.setUpdateMessage(!props.updateMessage);
         });
       });
     } else {
       props.setSuccessMessage('');
       props.setErrorMessage('There are errors in the Add Post form.');
+      props.setUpdateMessage(!props.updateMessage);
       setAddStatus('idle');
     }
   };

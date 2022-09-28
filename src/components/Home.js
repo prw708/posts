@@ -7,13 +7,12 @@ import { getPagedPosts } from '../features/postsSlice';
 
 export default function Home(props) {
   useEffect(() => {
-    if (props.status !== 'success') {
+    clearTimeout(props.updateMessageTimeout);
+    props.setUpdateMessageTimeout(setTimeout(() => {
       props.setSuccessMessage('');
       props.setErrorMessage('');
-    } else {
-      props.setErrorMessage('');
-    }
-  }, []);
+    }, 3000));
+  }, [props.updateMessage]);
 
   const dispatch = useDispatch();
   const posts = useSelector((state) => state.posts.posts);
@@ -29,6 +28,7 @@ export default function Home(props) {
   const [limitReached, setLimitReached] = useState(false);
   const [forceUpdate, setForceUpdate] = useState(false);
   const [newValue, setNewValue] = useState(true);
+  const [forceTextUpdate, setForceTextUpdate] = useState(false);
 
   useEffect(() => {
     if (limitReached) {
@@ -67,6 +67,7 @@ export default function Home(props) {
   }, [skip, forceUpdate]);
 
   useEffect(() => {
+    window.scrollTo(0, 0);
     let update = null;
 
     const debounceScroll = () => {
@@ -100,10 +101,20 @@ export default function Home(props) {
     setLimitReached(false);
     setSkip(0);
     setForceUpdate(!forceUpdate);
-  }, [searchText]);
+  }, [forceTextUpdate]);
 
-  const onSearchBarChange = (text) => {
-    setSearchText(text);
+  const onSearchBarChange = (text, valid) => {
+    if (valid) {
+      setSearchText(text);
+      props.setUpdateMessage(!props.updateMessage);
+      setForceTextUpdate(!forceTextUpdate);
+    } else {
+      setAllPosts([]);
+      setLimitReached(false);
+      props.setSuccessMessage('');
+      props.setErrorMessage('There is an error in the Search Bar.');
+      props.setUpdateMessage(!props.updateMessage);
+    }
   };
 
   return (
@@ -116,9 +127,6 @@ export default function Home(props) {
       <PostList 
         status={status} 
         posts={allPosts} 
-        error={error}
-        setSuccessMessage={props.setSuccessMessage}
-        setErrorMessage={props.setErrorMessage}
       ></PostList>
     </React.Fragment>
   );
