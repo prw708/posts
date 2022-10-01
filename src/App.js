@@ -13,7 +13,7 @@ import NotFound from './components/NotFound';
 function App(props) {
   const [successMessage, setSuccessMessage] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
-  const [updateMessage, setUpdateMessage] = useState(false);
+  const [updateMessage, setUpdateMessage] = useState(0);
   const [updateMessageTimeout, setUpdateMessageTimeout] = useState(null);
 
   return (

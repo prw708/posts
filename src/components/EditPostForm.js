@@ -86,7 +86,7 @@ export const EditPostForm = (props) => {
           })).unwrap();
           props.setSuccessMessage('Post edited successfully!');
           props.setErrorMessage('');
-          props.setUpdateMessage(!props.updateMessage);
+          props.setUpdateMessage(prev => prev + 1);
           setEditStatus('idle');
           navigate("/projects/posts/" + post.id);
         })
@@ -107,13 +107,13 @@ export const EditPostForm = (props) => {
             }
             props.setErrorMessage('There are errors in the Edit Post form.');
           }
-          props.setUpdateMessage(!props.updateMessage);
+          props.setUpdateMessage(prev => prev + 1);
         });
       });
     } else {
       props.setSuccessMessage('');
       props.setErrorMessage('There are errors in the Edit Post form.');
-      props.setUpdateMessage(!props.updateMessage);
+      props.setUpdateMessage(prev => prev + 1);
       setEditStatus('idle');
     }
   };
@@ -128,7 +128,7 @@ export const EditPostForm = (props) => {
     if (!props.username) {
       props.setSuccessMessage('');
       props.setErrorMessage('You must be logged in to edit posts.');
-      props.setUpdateMessage(!props.updateMessage);
+      props.setUpdateMessage(prev => prev + 1);
       return (<React.Fragment>
         <span className="fs-1">Edit Post</span>
         <div className="alert alert-info mt-4 px-4">You must be <a href="/website/account/login" className="link-dark">logged in</a> to edit a post.</div>
@@ -136,7 +136,7 @@ export const EditPostForm = (props) => {
     } else if (!post || !post.title || !post.post || !post.author) {
       props.setSuccessMessage('');
       props.setErrorMessage('Post not found.');
-      props.setUpdateMessage(!props.updateMessage);
+      props.setUpdateMessage(prev => prev + 1);
       return (<React.Fragment>
         <span className="fs-1">Edit Post</span>
         <p className="mt-4">No post to edit.</p>
@@ -144,7 +144,7 @@ export const EditPostForm = (props) => {
     } else if (props.username !== post.author) {
       props.setSuccessMessage('');
       props.setErrorMessage('This post does not belong to you.');
-      props.setUpdateMessage(!props.updateMessage);
+      props.setUpdateMessage(prev => prev + 1);
       return (<React.Fragment>
         <span className="fs-1">Edit Post</span>
         <p className="mt-4">No post to edit.</p>

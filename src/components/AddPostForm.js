@@ -72,7 +72,7 @@ export const AddPostForm = (props) => {
           setPost('');
           props.setSuccessMessage('Post added successfully!');
           props.setErrorMessage('');
-          props.setUpdateMessage(!props.updateMessage);
+          props.setUpdateMessage(prev => prev + 1);
           setAddStatus('idle');
           navigate("/projects/posts/" + posted.id);
         })
@@ -93,13 +93,13 @@ export const AddPostForm = (props) => {
             }
             props.setErrorMessage('There are errors in the Add Post form.');
           }
-          props.setUpdateMessage(!props.updateMessage);
+          props.setUpdateMessage(prev => prev + 1);
         });
       });
     } else {
       props.setSuccessMessage('');
       props.setErrorMessage('There are errors in the Add Post form.');
-      props.setUpdateMessage(!props.updateMessage);
+      props.setUpdateMessage(prev => prev + 1);
       setAddStatus('idle');
     }
   };

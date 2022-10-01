@@ -79,7 +79,7 @@ export default function Users(props) {
   } else if (status === 'failed') {
     props.setSuccessMessage('');
     props.setErrorMessage('An error occurred while getting the users.');
-    props.setUpdateMessage(!props.updateMessage);
+    props.setUpdateMessage(prev => prev + 1);
     return (
       <React.Fragment>
         <span className="fs-1">Users</span>

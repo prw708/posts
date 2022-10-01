@@ -26,12 +26,13 @@ export default function Home(props) {
   const [searchText, setSearchText] = useState('');
   const [allPosts, setAllPosts] = useState([]);
   const [limitReached, setLimitReached] = useState(false);
-  const [forceUpdate, setForceUpdate] = useState(false);
-  const [newValue, setNewValue] = useState(true);
-  const [forceTextUpdate, setForceTextUpdate] = useState(false);
+  const [forceUpdate, setForceUpdate] = useState(0);
+  const [newValue, setNewValue] = useState(false);
+  const [forceTextUpdate, setForceTextUpdate] = useState(0);
+  const [initial, setInitial] = useState(true);
 
   useEffect(() => {
-    if (limitReached) {
+    if (limitReached || initial) {
       return;
     }
     if (status === 'idle') {
@@ -40,11 +41,9 @@ export default function Home(props) {
         skip: skip,
         searchText: searchText
       }));
-    }
-    if (status === 'loading') {
+    } else if (status === 'loading') {
       setNewValue(true);
-    }
-    if (status === 'success') {
+    } else if (status === 'success') {
       if (!posts || posts.length === 0) {
         setLimitReached(true);
       }
@@ -56,19 +55,58 @@ export default function Home(props) {
   }, [status, posts]);
 
   useEffect(() => {
-    if (limitReached) {
+    let s = 0;
+    if (limitReached || initial) {
       return;
+    }
+    if (allPosts && skip > allPosts.length) {
+      s = allPosts.length;
+    } else {
+      s = skip;
     }
     dispatch(getPagedPosts({
       size: size,
-      skip: skip,
+      skip: s,
       searchText: searchText
     }));
   }, [skip, forceUpdate]);
 
   useEffect(() => {
+    if (Math.ceil(document.body.scrollHeight) < Math.ceil(window.innerHeight)) {
+      if (status === 'loading') {
+        setNewValue(true);
+      } else if (status === 'success') {
+        if (!posts || posts.length === 0) {
+          setLimitReached(true);
+        }
+        if (newValue) {
+          setAllPosts([...allPosts, ...posts]);
+          dispatch(getPagedPosts({
+            size: size,
+            skip: skip + POST_SCROLL_ADD,
+            searchText: searchText
+          }));
+          setSkip(prev => prev + POST_SCROLL_ADD);
+        }
+        setNewValue(false);
+      }
+    } else {
+      setInitial(false);
+    }
+  }, [status]);
+
+  useEffect(() => {
     window.scrollTo(0, 0);
     let update = null;
+
+    if (Math.ceil(document.body.scrollHeight) < Math.ceil(window.innerHeight)) {
+      dispatch(getPagedPosts({
+        size: size,
+        skip: skip,
+        searchText: searchText
+      }));
+      setSkip(prev => prev + POST_SCROLL_ADD);
+    }
 
     const debounceScroll = () => {
       return function() {
@@ -100,20 +138,20 @@ export default function Home(props) {
     setAllPosts([]);
     setLimitReached(false);
     setSkip(0);
-    setForceUpdate(!forceUpdate);
+    setForceUpdate(prev => prev + 1);
   }, [forceTextUpdate]);
 
   const onSearchBarChange = (text, valid) => {
     if (valid) {
       setSearchText(text);
-      props.setUpdateMessage(!props.updateMessage);
-      setForceTextUpdate(!forceTextUpdate);
+      props.setUpdateMessage(prev => prev + 1);
+      setForceTextUpdate(prev => prev + 1);
     } else {
       setAllPosts([]);
       setLimitReached(false);
       props.setSuccessMessage('');
       props.setErrorMessage('There is an error in the Search Bar.');
-      props.setUpdateMessage(!props.updateMessage);
+      props.setUpdateMessage(prev => prev + 1);
     }
   };
 
