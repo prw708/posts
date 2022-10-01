@@ -72,7 +72,7 @@ export default function Home(props) {
   }, [skip, forceUpdate]);
 
   useEffect(() => {
-    if (Math.ceil(document.body.scrollHeight) < Math.ceil(window.innerHeight)) {
+    if (!limitReached && Math.ceil(document.body.scrollHeight) < Math.ceil(window.innerHeight)) {
       if (status === 'loading') {
         setNewValue(true);
       } else if (status === 'success') {
