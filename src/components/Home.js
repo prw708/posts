@@ -141,14 +141,15 @@ export default function Home(props) {
     setForceUpdate(prev => prev + 1);
   }, [forceTextUpdate]);
 
-  const onSearchBarChange = (text, valid) => {
+  const handleSearchBarChange = (text, valid) => {
     if (valid) {
       setSearchText(text);
+      setLimitReached(false);
       props.setUpdateMessage(prev => prev + 1);
       setForceTextUpdate(prev => prev + 1);
     } else {
       setAllPosts([]);
-      setLimitReached(false);
+      setLimitReached(true);
       props.setSuccessMessage('');
       props.setErrorMessage('There is an error in the Search Bar.');
       props.setUpdateMessage(prev => prev + 1);
@@ -160,7 +161,7 @@ export default function Home(props) {
       <span className="fs-1">All Posts</span>
       <SearchBar 
         searchText={searchText}
-        onSearchBarChange={onSearchBarChange}
+        onSearchBarChange={handleSearchBarChange}
       ></SearchBar>
       <PostList 
         status={status} 

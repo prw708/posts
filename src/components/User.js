@@ -156,11 +156,12 @@ export default function User(props) {
   const onSearchBarChange = (text, valid) => {
     if (valid) {
       setSearchText(text);
+      setLimitReached(false);
       props.setUpdateMessage(prev => prev + 1);
       setForceTextUpdate(prev => prev + 1);
     } else {
       setAllPosts([]);
-      setLimitReached(false);
+      setLimitReached(true);
       props.setSuccessMessage('');
       props.setErrorMessage('There is an error in the Search Bar.');
       props.setUpdateMessage(prev => prev + 1);

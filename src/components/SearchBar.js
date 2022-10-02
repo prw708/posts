@@ -1,10 +1,9 @@
 import React, { useState, useEffect } from 'react';
 
 export default function SearchBar(props) {
-
   const [text, setText] = useState('');
   const [textValidity, setTextValidity] = useState(true);
-  let update = null;
+  const [update, setUpdate] = useState(null);
 
   const validate = (val) => {
     if (/^[A-Za-z0-9 _!.,?"'-]{0,100}$/.test(val)) {
@@ -16,7 +15,7 @@ export default function SearchBar(props) {
     }
   };
 
-  const onSearchBarChange = (e) => {
+  const handleChange = (e) => {
     let valid = validate(e.target.value);
     props.onSearchBarChange(e.target.value, valid);
   };
@@ -25,10 +24,10 @@ export default function SearchBar(props) {
     setText(e.target.value);
     return function() {
       clearTimeout(update);
-      update = setTimeout(function() {
-        update = null;
-        onSearchBarChange(e);
-      }, 1000);
+      setUpdate(setTimeout(function() {
+        setUpdate(null);
+        handleChange(e);
+      }, 1000));
     };
   };
 
