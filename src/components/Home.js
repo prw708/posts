@@ -130,8 +130,10 @@ export default function Home(props) {
       if (status === 'loading') {
         return false;
       }
-      if (Math.ceil(window.innerHeight) + Math.ceil(window.scrollY) >= Math.ceil(document.body.scrollHeight) || 
-          Math.ceil(window.innerHeight) + Math.ceil(window.pageYOffset) >= Math.ceil(document.body.scrollHeight)) {
+      let divHeight = Math.ceil(window.pageYOffset + document.getElementById("root").getBoundingClientRect().top) + 
+        Math.ceil(document.getElementById("root").scrollHeight);
+      if ((Math.ceil(window.innerHeight) + Math.ceil(window.scrollY) >= divHeight) || 
+          (Math.ceil(window.innerHeight) + Math.ceil(window.pageYOffset) >= divHeight)) {
         setSkip(prev => prev + POST_SCROLL_ADD);
       }
     };
