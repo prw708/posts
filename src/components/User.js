@@ -40,34 +40,66 @@ export default function User(props) {
   const [initial, setInitial] = useState(true);
 
   useEffect(() => {
+    if (limitReached) {
+      return;
+    }
+    if (Math.ceil(document.body.scrollHeight) <= Math.ceil(window.innerHeight)) {
+      if (status === 'loading') {
+        setNewValue(true);
+      } else if (status === 'success') {
+        if (!postsByUser || postsByUser.length === 0) {
+          setLimitReached(true);
+        } else {
+          if (newValue) {
+            setAllPosts([...allPosts, ...postsByUser]);
+            setTimeout(() => {
+              if (Math.ceil(document.body.scrollHeight) > Math.ceil(window.innerHeight)) {
+                setInitial(false);
+                return;
+              }
+              dispatch(getUserPagedPosts({
+                author: params.user,
+                size: size,
+                skip: skip + POST_SCROLL_ADD,
+                searchText: searchText
+              }));
+              setSkip(prev => prev + POST_SCROLL_ADD);
+            }, 750);
+          }
+        }
+        setNewValue(false);
+      }
+    } else {
+      if (initial) {
+        setNewValue(true);
+      }
+      setInitial(false);
+    }
+  }, [status]);
+
+  useEffect(() => {
     if (limitReached || initial) {
       return;
     }
-    if (status === 'idle') {
-      dispatch(getUserPagedPosts({
-        author: params.user, 
-        size: size,
-        skip: skip,
-        searchText: searchText
-      }));
-    } else if (status === 'loading') {
+    if (status === 'loading') {
       setNewValue(true);
     } else if (status === 'success') {
       if (!postsByUser || postsByUser.length === 0) {
         setLimitReached(true);
-      }
-      if (newValue) {
-        setAllPosts([...allPosts, ...postsByUser]);
+      } else {
+        if (newValue) {
+          setAllPosts([...allPosts, ...postsByUser]);
+        }
       }
       setNewValue(false);
     }
   }, [status, postsByUser]);
 
   useEffect(() => {
-    let s = 0;
     if (limitReached || initial) {
       return;
     }
+    let s = 0;
     if (allPosts && skip > allPosts.length) {
       s = allPosts.length;
     } else {
@@ -79,46 +111,21 @@ export default function User(props) {
       skip: s,
       searchText: searchText
     }));
-  }, [skip, forceUpdate]);
+  }, [skip]);
 
   useEffect(() => {
-    if (!limitReached && Math.ceil(document.body.scrollHeight) < Math.ceil(window.innerHeight)) {
-      if (status === 'loading') {
-        setNewValue(true);
-      } else if (status === 'success') {
-        if (!postsByUser || postsByUser.length === 0) {
-          setLimitReached(true);
-        }
-        if (newValue) {
-          setAllPosts([...allPosts, ...postsByUser]);
-          dispatch(getUserPagedPosts({
-            author: params.user,
-            size: size,
-            skip: skip + POST_SCROLL_ADD,
-            searchText: searchText
-          }));
-          setSkip(prev => prev + POST_SCROLL_ADD);
-        }
-        setNewValue(false);
-      }
-    } else {
-      setInitial(false);
-    }
-  }, [status]);
+    dispatch(getUserPagedPosts({
+      author: params.user, 
+      size: size,
+      skip: 0,
+      searchText: searchText
+    }));
+    setSkip(prev => prev + POST_SCROLL_ADD);
+  }, [forceUpdate]);
 
   useEffect(() => {
     window.scrollTo(0, 0);
     let update = null;
-
-    if (Math.ceil(document.body.scrollHeight) < Math.ceil(window.innerHeight)) {
-      dispatch(getUserPagedPosts({
-        author: params.user,
-        size: size,
-        skip: skip,
-        searchText: searchText
-      }));
-      setSkip(prev => prev + POST_SCROLL_ADD);
-    }
 
     const debounceScroll = () => {
       return function() {
@@ -148,6 +155,7 @@ export default function User(props) {
 
   useEffect(() => {
     setAllPosts([]);
+    setInitial(true);
     setLimitReached(false);
     setSkip(0);
     setForceUpdate(prev => prev + 1);
@@ -159,8 +167,12 @@ export default function User(props) {
       setLimitReached(false);
       props.setUpdateMessage(prev => prev + 1);
       setForceTextUpdate(prev => prev + 1);
+      props.setSuccessMessage('');
+      props.setErrorMessage('');
+      props.setUpdateMessage(prev => prev + 1);
     } else {
       setAllPosts([]);
+      setInitial(true);
       setLimitReached(true);
       props.setSuccessMessage('');
       props.setErrorMessage('There is an error in the Search Bar.');
