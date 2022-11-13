@@ -11589,7 +11589,7 @@ textarea.form-control-lg {
 }
 /* Navbar Brand */
 .navbar-brand-logo {
-  background-image: url("./images/pws_header.png");
+  background-image: url("images/pws_header.png");
   background-position: center;
   background-repeat: no-repeat;
   background-size: 100%;
@@ -11625,6 +11625,11 @@ textarea.form-control-lg {
 
 .overflow-y-scroll {
   overflow-y: scroll;
+}
+
+/* Text */
+.preserve-white-space {
+  white-space: pre-wrap;
 }
 
 /* Navbar */
@@ -11774,9 +11779,8 @@ nav.dropdown-menu-dark {
   left: -2000px;
 }
 
-.preserve-white-space, .comment-text {
+.comment-text {
   font-family: Roboto, system-ui, -apple-system, "Segoe UI", "Helvetica Neue", "Noto Sans", "Liberation Sans", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
-  white-space: pre-wrap;
 }
 
 /* Footer */

@@ -37,20 +37,24 @@ export default function Layout(props) {
           </ul>
           <span className="link-dark fs-4">Account</span>
           <hr className="link-dark" />
-          { props.username && 
-            <form method="POST" action="/website/account/logout">
-              <input type="hidden" name="_csrf" value={props.csrfToken} />
-              <input type="hidden" name="time" value={props.time} />
-              <button 
-                  type="submit"
-                  name="logout"
-                  value="true"
-                  className="nav-link link-dark bg-transparent w-100 border-0 text-start">Logout</button>
-            </form>
-          }
-          { !props.username && 
-            <a href="/website/account/login" className="nav-link link-dark">Login</a>
-          }
+          <ul className="nav nav-pills flex-column mb-0">
+            <li className="nav-item">
+            { props.username && 
+              <form method="POST" action="/website/account/logout">
+                <input type="hidden" name="_csrf" value={props.csrfToken} />
+                <input type="hidden" name="time" value={props.time} />
+                <button 
+                    type="submit"
+                    name="logout"
+                    value="true"
+                    className="nav-link link-dark bg-transparent w-100 border-0 text-start">Logout</button>
+              </form>
+            }
+            { !props.username && 
+              <a href="/website/account/login" className="nav-link link-dark">Login</a>
+            }
+            </li>
+          </ul>
         </nav>
         <div className="col-sm-7 col-md-8 col-lg-9 p-4">
           <Outlet />
